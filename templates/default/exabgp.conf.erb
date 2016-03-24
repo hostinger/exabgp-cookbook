@@ -7,6 +7,7 @@ neighbor <%= @neighbor_ipv4 %> {
   peer-as <%= @peer_as %>;
   hold-time <%= @hold_time %>;
   family {
+    ipv6 unicast;
     ipv4 unicast;
   }
 
@@ -44,6 +45,7 @@ neighbor <%= @neighbor_ipv6 %> {
   hold-time <%= @hold_time %>;
   family {
     ipv6 unicast;
+    ipv4 unicast;
   }
 
   static {
