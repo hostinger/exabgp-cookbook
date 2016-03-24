@@ -15,7 +15,7 @@ neighbor <%= @neighbor_ipv4 %> {
   static {
     <% @route_ipv4.each do |ip| %>
     route <%= ip %> {
-      next-hop <%= @local_address_ipv4 %>;
+      next-hop <%= exabgp_next_hop(ip) %>;
       <% if @local_preference %>
       local-preference <%= @local_preference %>;
       <% end %>
@@ -51,7 +51,7 @@ neighbor <%= @neighbor_ipv6 %> {
   static {
     <% @route_ipv6.each do |ip| %>
     route <%= ip %> {
-      next-hop <%= @local_address_ipv6 %>;
+      next-hop <%= exabgp_next_hop(ip) %>;
       <% if @local_preference %>
       local-preference <%= @local_preference %>;
       <% end %>

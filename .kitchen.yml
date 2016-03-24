@@ -2,10 +2,10 @@
 driver_plugin: vagrant
 
 provisioner:
-  name: chef_solo
+  name: chef_zero
 
 platforms:
-  - name: centos-7.1
+  - name: centos-7.2
 
 suites:
   - name: source
@@ -13,6 +13,16 @@ suites:
       - recipe[exabgp::source]
     attributes:
       exabgp:
+        ipv4:
+          neighbor: 192.168.1.1
+          anycast:
+            - 192.168.2.1/32
+            - 2001:bad::2/128
+        ipv6:
+          neighbor: 2001:dead::179
+          anycast:
+            - 192.168.169.52/32
+            - 2001:bad::1/128
         source_version: '3.4'
         hubot:
           enable: true
