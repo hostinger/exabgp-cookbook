@@ -1,5 +1,5 @@
-default[:exabgp][:local_as] = 12345
-default[:exabgp][:peer_as] = 12345
+default[:exabgp][:local_as] = 123_45
+default[:exabgp][:peer_as] = 123_45
 default[:exabgp][:community] = [0]
 
 default[:exabgp][:hold_time] = 20
@@ -14,6 +14,7 @@ default[:exabgp][:ipv6][:anycast] = []
 
 default[:exabgp][:source_version] = 'master'
 default[:exabgp][:bin_path] = '/usr/local/bin/exabgp'
+default[:exabgp][:config_path] = '/etc/exabgp/exabgp.conf'
 
 default[:exabgp][:watchdog_flag_file] = '/tmp/exabgp-announce'
 
