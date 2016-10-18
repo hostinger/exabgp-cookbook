@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+include_recipe 'build-essential::default' if node[:exabgp][:exazk][:enable]
+
 systemd_enabled = File.open('/proc/1/comm').gets.chomp == 'systemd'
 
 include_recipe 'python'
@@ -39,6 +41,8 @@ template 'exabgp: config' do
              route_ipv4: route('ipv4'),
              enable_ipv4_static_route: node[:exabgp][:ipv4][:enable_static_route],
              enable_hubot: node[:exabgp][:hubot][:enable],
+             enable_exazk: node[:exabgp][:exazk][:enable],
+             exazk_routes: node[:exabgp][:exazk][:routes],
              neighbor_ipv6: node[:exabgp][:ipv6][:neighbor],
              local_address_ipv6: ipv6_next_hop,
              route_ipv6: route('ipv6'),
@@ -61,6 +65,17 @@ template '/etc/exabgp/neighbor-changes.rb' do
   notifies :run, 'execute[reload-exabgp-config]' unless systemd_enabled
   notifies :reload, 'service[exabgp]' if systemd_enabled
 end
+
+template '/etc/exabgp/exazk.rb' do
+  variables config: node[:exabgp][:exazk],
+            routes: exabgp_exazk_routes
+  mode 0755
+  notifies :run, 'execute[reload-exabgp-config]' unless systemd_enabled
+  notifies :reload, 'service[exabgp]' if systemd_enabled
+  only_if { node[:exabgp][:exazk][:enable] }
+end
+
+gem_package 'exazk' if node[:exabgp][:exazk][:enable]
 
 execute 'reload-exabgp-config' do
   action :nothing

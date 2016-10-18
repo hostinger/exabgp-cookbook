@@ -26,3 +26,8 @@ suites:
         source_version: '3.4'
         hubot:
           enable: true
+        exazk:
+          enable: true
+          routes:
+            - 192.168.2.2/32
+            - 2001:bad::3/128

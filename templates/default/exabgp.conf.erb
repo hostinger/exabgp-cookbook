@@ -32,6 +32,11 @@ neighbor <%= @neighbor_ipv4 %> {
     run /etc/exabgp/neighbor-changes.rb;
   }
   <% end %>
+  <% if @enable_exazk && @exazk_routes.any? -%>
+  process announce-routes {
+    run /etc/exabgp/exazk.rb;
+  }
+  <% end %>
 }
 <% end %>
 
@@ -65,6 +70,11 @@ neighbor <%= @neighbor_ipv6 %> {
     encoder json;
     neighbor-changes;
     run /etc/exabgp/neighbor-changes.rb;
+  }
+  <% end %>
+  <% if @enable_exazk && @exazk_routes.any? -%>
+  process announce-routes {
+    run /etc/exabgp/exazk.rb;
   }
   <% end %>
 }

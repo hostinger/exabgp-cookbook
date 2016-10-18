@@ -1,0 +1,11 @@
+#!/opt/rbenv/shims/ruby
+require 'exazk'
+
+exazk = ExaZK.new('<%= @config[:zookeeper][:path] %>',
+                  '<%= @config[:zookeeper][:connection] %>',
+                  <%= @routes %>,
+                  '<%= @config[:name] %>')
+while true
+  exazk.main_loop
+  sleep <%= @config[:refresh_interval] %>
+end

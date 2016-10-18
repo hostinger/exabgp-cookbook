@@ -18,6 +18,13 @@ default[:exabgp][:config_path] = '/etc/exabgp/exabgp.conf'
 
 default[:exabgp][:watchdog_flag_file] = '/tmp/exabgp-announce'
 
+default[:exabgp][:exazk][:enable] = false
+default[:exabgp][:exazk][:name] = 'HA test'
+default[:exabgp][:exazk][:refresh_interval] = 5
+default[:exabgp][:exazk][:routes] = %w()
+default[:exabgp][:exazk][:zookeeper][:connection] = 'localhost:2181/exazk'
+default[:exabgp][:exazk][:zookeeper][:path] = '/mutex'
+
 default[:exabgp][:hubot][:enable] = false
 default[:exabgp][:hubot][:url] = 'http://localhost:9998'
 default[:exabgp][:hubot][:secret] = 'secret'
