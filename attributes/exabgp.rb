@@ -25,6 +25,8 @@ default[:exabgp][:exazk][:routes] = %w()
 default[:exabgp][:exazk][:zookeeper][:connection] = 'localhost:2181/exazk'
 default[:exabgp][:exazk][:zookeeper][:path] = '/mutex'
 
+default[:exabgp][:systemd][:after] = %w(network.target)
+
 default[:exabgp][:hubot][:enable] = false
 default[:exabgp][:hubot][:url] = 'http://localhost:9998'
 default[:exabgp][:hubot][:secret] = 'secret'

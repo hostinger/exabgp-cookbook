@@ -88,7 +88,8 @@ end unless systemd_enabled
 
 systemd_service 'exabgp' do
   description 'ExaBGP service'
-  after %w(network.target)
+  after node[:exabgp][:systemd][:after]
+  requires node[:exabgp][:systemd][:requires] if node[:exabgp][:systemd][:requires]
   condition_path_exists node[:exabgp][:config_path]
   service do
     environment 'exabgp_daemon_daemonize' => 'false'
