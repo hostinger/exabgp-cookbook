@@ -17,39 +17,36 @@
 # limitations under the License.
 #
 
-include_recipe 'build-essential::default' if node[:exabgp][:exazk][:enable]
-
 systemd_enabled = File.open('/proc/1/comm').gets.chomp == 'systemd'
 
-include_recipe 'python'
+include_recipe 'build-essential::default' if node['exabgp']['exazk']['enable']
 include_recipe 'runit' unless systemd_enabled
 
-python_pip 'exabgp' do
-  action :install
-end unless node[:recipes].include? 'exabgp::source'
+python_runtime '2'
+python_package 'exabgp' unless node['recipes'].include? 'exabgp::source'
 
 directory '/etc/exabgp'
 
 template 'exabgp: config' do
-  path node[:exabgp][:config_path]
+  path node['exabgp']['config_path']
   source 'exabgp.conf.erb'
-  variables( router_id: node.ipaddress,
-             hold_time: node[:exabgp][:hold_time],
-             neighbor_ipv4: node[:exabgp][:ipv4][:neighbor],
-             local_address_ipv4: node.ipaddress,
-             local_preference: node[:exabgp][:local_preference],
+  variables( router_id: node['ipaddress'],
+             hold_time: node['exabgp']['hold_time'],
+             neighbor_ipv4: node['exabgp']['ipv4']['neighbor'],
+             local_address_ipv4: node['ipaddress'],
+             local_preference: node['exabgp']['local_preference'],
              route_ipv4: route('ipv4'),
-             enable_ipv4_static_route: node[:exabgp][:ipv4][:enable_static_route],
-             enable_hubot: node[:exabgp][:hubot][:enable],
-             enable_exazk: node[:exabgp][:exazk][:enable],
-             exazk_routes: node[:exabgp][:exazk][:routes],
-             neighbor_ipv6: node[:exabgp][:ipv6][:neighbor],
+             enable_ipv4_static_route: node['exabgp']['ipv4']['enable_static_route'],
+             enable_hubot: node['exabgp']['hubot']['enable'],
+             enable_exazk: node['exabgp']['exazk']['enable'],
+             exazk_routes: node['exabgp']['exazk']['routes'],
+             neighbor_ipv6: node['exabgp']['ipv6']['neighbor'],
              local_address_ipv6: ipv6_next_hop,
              route_ipv6: route('ipv6'),
-             local_as: node[:exabgp][:local_as],
-             peer_as: node[:exabgp][:peer_as],
-             community: node[:exabgp][:community].join(' '))
-  mode '644'
+             local_as: node['exabgp']['local_as'],
+             peer_as: node['exabgp']['peer_as'],
+             community: node['exabgp']['community'].join(' '))
+  mode 0o0644
   notifies :run, 'execute[reload-exabgp-config]' unless systemd_enabled
   notifies :reload, 'service[exabgp]' if systemd_enabled
 end
@@ -57,25 +54,25 @@ end
 template '/etc/exabgp/neighbor-changes.rb' do
   source 'neighbor-changes.rb.erb'
   variables hubot_publish: {
-              url: node[:exabgp][:hubot][:url],
-              secret: node[:exabgp][:hubot][:secret],
-              event: node[:exabgp][:hubot][:event]
+              url: node['exabgp']['hubot']['url'],
+              secret: node['exabgp']['hubot']['secret'],
+              event: node['exabgp']['hubot']['event']
             }
-  mode 0755
+  mode 0o0755
   notifies :run, 'execute[reload-exabgp-config]' unless systemd_enabled
   notifies :reload, 'service[exabgp]' if systemd_enabled
 end
 
 template '/etc/exabgp/exazk.rb' do
-  variables config: node[:exabgp][:exazk],
+  variables config: node['exabgp']['exazk'],
             routes: exabgp_exazk_routes
-  mode 0755
+  mode 0o0755
   notifies :run, 'execute[reload-exabgp-config]' unless systemd_enabled
   notifies :reload, 'service[exabgp]' if systemd_enabled
-  only_if { node[:exabgp][:exazk][:enable] }
+  only_if { node['exabgp']['exazk']['enable'] }
 end
 
-gem_package 'exazk' if node[:exabgp][:exazk][:enable]
+gem_package 'exazk' if node['exabgp']['exazk']['enable']
 
 execute 'reload-exabgp-config' do
   action :nothing
@@ -87,23 +84,19 @@ runit_service 'exabgp' do
 end unless systemd_enabled
 
 systemd_service 'exabgp' do
-  description 'ExaBGP service'
-  after node[:exabgp][:systemd][:after]
-  requires node[:exabgp][:systemd][:requires] if node[:exabgp][:systemd][:requires]
-  condition_path_exists node[:exabgp][:config_path]
-  service do
-    environment 'exabgp_daemon_daemonize' => 'false'
-    exec_start "#{node[:exabgp][:bin_path]} #{node[:exabgp][:config_path]}"
-    exec_reload '/bin/kill -s USR1 $MAINPID'
-    user 'nobody'
-  end
-  install do
-    wanted_by 'multi-user.target'
-  end
+  unit_description 'ExaBGP service'
+  unit_after node['exabgp']['systemd']['after']
+  unit_requires node['exabgp']['systemd']['requires'] if node['exabgp']['systemd']['requires']
+  unit_condition_path_exists node['exabgp']['config_path']
+  service_environment 'exabgp_daemon_daemonize' => 'false'
+  service_exec_start "#{node['exabgp']['bin_path']} #{node['exabgp']['config_path']}"
+  service_exec_reload '/bin/kill -s USR1 $MAINPID'
+  service_user 'nobody'
+  install_wanted_by 'multi-user.target'
   only_if { systemd_enabled }
 end
 
 service 'exabgp' do
-  action [:enable, :start]
+  action %i[enable start]
   only_if { systemd_enabled }
 end

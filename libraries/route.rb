@@ -20,7 +20,7 @@ def exabgp_next_hop(ip)
 end
 
 def exabgp_exazk_routes
-  node[:exabgp][:exazk][:routes].map do |route|
+  node['exabgp']['exazk']['routes'].map do |route|
     "%s route #{route} next-hop #{exabgp_next_hop(route)}\n"
   end
 end
