@@ -22,7 +22,10 @@ systemd_enabled = File.open('/proc/1/comm').gets.chomp == 'systemd'
 include_recipe 'build-essential::default' if node['exabgp']['exazk']['enable']
 include_recipe 'runit' unless systemd_enabled
 
-python_runtime '2'
+python_runtime '2' do
+  provider :system
+end
+
 python_package 'exabgp' unless node['recipes'].include? 'exabgp::source'
 
 directory '/etc/exabgp'
