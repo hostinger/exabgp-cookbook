@@ -3,11 +3,17 @@ def route(version = 'ipv4')
   return anycast_ip.kind_of?(String) ? [anycast_ip] : anycast_ip
 end
 
+def ipv6_next_hop_link_local
+  default_if = node['network']['default_inet6_interface']
+  node['network']['interfaces'][default_if]['addresses'].each do |address, opts|
+    next unless opts['scope'] == 'Link' && opts['family'] == 'inet6'
+
+    return address
+  end
+end
+
 def ipv6_next_hop
-  cmd = Mixlib::ShellOut.new("ip route get #{node['exabgp']['ipv6']['neighbor']}")
-  cmd.run_command
-  next_hop = cmd.stdout.match(/src ([\w\d\:]+)/)[1] unless cmd.stdout.empty?
-  next_hop || node['ip6address']
+  ipv6_next_hop_link_local || node['ip6address']
 end
 
 def exabgp_next_hop(ip)

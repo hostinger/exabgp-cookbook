@@ -44,7 +44,7 @@ template 'exabgp: config' do
              enable_exazk: node['exabgp']['exazk']['enable'],
              exazk_routes: node['exabgp']['exazk']['routes'],
              neighbor_ipv6: node['exabgp']['ipv6']['neighbor'],
-             local_address_ipv6: ipv6_next_hop,
+             local_address_ipv6: node['ip6address'],
              route_ipv6: route('ipv6'),
              local_as: node['exabgp']['local_as'],
              peer_as: node['exabgp']['peer_as'],
