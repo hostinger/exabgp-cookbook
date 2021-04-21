@@ -4,6 +4,8 @@ def route(version = 'ipv4')
 end
 
 def ipv6_next_hop_link_local
+  return unless node['network']['default_inet6_interface']
+
   default_if = node['network']['default_inet6_interface']
   node['network']['interfaces'][default_if]['addresses'].each do |address, opts|
     next unless opts['scope'] == 'Link' && opts['family'] == 'inet6'
