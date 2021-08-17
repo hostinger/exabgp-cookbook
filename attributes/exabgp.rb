@@ -25,6 +25,7 @@ default['exabgp']['exazk']['routes'] = %w()
 default['exabgp']['exazk']['zookeeper']['connection'] = 'localhost:2181/exazk'
 default['exabgp']['exazk']['zookeeper']['path'] = '/mutex'
 
+default['exabgp']['systemd']['enabled'] = File.open('/proc/1/comm').gets.chomp == 'systemd'
 default['exabgp']['systemd']['after'] = %w(network.target)
 
 default['exabgp']['hubot']['enable'] = false
@@ -33,3 +34,6 @@ default['exabgp']['hubot']['secret'] = 'secret'
 default['exabgp']['hubot']['event'] = 'sre'
 
 default['exabgp']['python']['version'] = '2.7.18'
+default['exabgp']['python']['path'] = '/usr/local/pyenv/shims'
+
+default['pyenv']['git_ref'] = '1.2.26'

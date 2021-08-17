@@ -1,5 +1,7 @@
 source 'https://supermarket.chef.io'
 
+cookbook 'seven_zip', '= 3.2.0'
+
 metadata
 
 group :test do

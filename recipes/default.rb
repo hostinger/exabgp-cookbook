@@ -17,10 +17,8 @@
 # limitations under the License.
 #
 
-systemd_enabled = File.open('/proc/1/comm').gets.chomp == 'systemd'
-
 include_recipe 'build-essential::default' if node['exabgp']['exazk']['enable']
-include_recipe 'runit' unless systemd_enabled
+include_recipe 'runit' unless node['exabgp']['systemd']['enabled']
 
 pyenv_system_install 'system'
 pyenv_python node['exabgp']['python']['version']
@@ -50,8 +48,8 @@ template 'exabgp: config' do
              peer_as: node['exabgp']['peer_as'],
              community: node['exabgp']['community'].join(' '))
   mode 0o0644
-  notifies :run, 'execute[reload-exabgp-config]' unless systemd_enabled
-  notifies :reload, 'service[exabgp]' if systemd_enabled
+  notifies :run, 'execute[reload-exabgp-config]' unless node['exabgp']['systemd']['enabled']
+  notifies :reload, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
 end
 
 template '/etc/exabgp/neighbor-changes.rb' do
@@ -62,16 +60,16 @@ template '/etc/exabgp/neighbor-changes.rb' do
               event: node['exabgp']['hubot']['event']
             }
   mode 0o0755
-  notifies :run, 'execute[reload-exabgp-config]' unless systemd_enabled
-  notifies :reload, 'service[exabgp]' if systemd_enabled
+  notifies :run, 'execute[reload-exabgp-config]' unless node['exabgp']['systemd']['enabled']
+  notifies :reload, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
 end
 
 template '/etc/exabgp/exazk.rb' do
   variables config: node['exabgp']['exazk'],
             routes: exabgp_exazk_routes
   mode 0o0755
-  notifies :run, 'execute[reload-exabgp-config]' unless systemd_enabled
-  notifies :reload, 'service[exabgp]' if systemd_enabled
+  notifies :run, 'execute[reload-exabgp-config]' unless node['exabgp']['systemd']['enabled']
+  notifies :reload, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
   only_if { node['exabgp']['exazk']['enable'] }
 end
 
@@ -82,9 +80,14 @@ execute 'reload-exabgp-config' do
   command 'sv 2 exabgp'
 end
 
+execute 'restart-exabgp' do
+  action :nothing
+  command 'sv restart exabgp'
+end
+
 runit_service 'exabgp' do
   default_logger true
-end unless systemd_enabled
+end unless node['exabgp']['systemd']['enabled']
 
 systemd_service 'exabgp' do
   unit_description 'ExaBGP service'
@@ -92,14 +95,14 @@ systemd_service 'exabgp' do
   unit_requires node['exabgp']['systemd']['requires'] if node['exabgp']['systemd']['requires']
   unit_condition_path_exists node['exabgp']['config_path']
   service_environment 'exabgp_daemon_daemonize' => 'false'
-  service_exec_start "#{node['exabgp']['bin_path']} #{node['exabgp']['config_path']}"
+  service_exec_start "/bin/bash -c 'PATH=#{node['exabgp']['python']['path']}:$PATH #{node['exabgp']['bin_path']} #{node['exabgp']['config_path']}'"
   service_exec_reload '/bin/kill -s USR1 $MAINPID'
   service_user 'nobody'
   install_wanted_by 'multi-user.target'
-  only_if { systemd_enabled }
+  only_if { node['exabgp']['systemd']['enabled'] }
 end
 
 service 'exabgp' do
   action %i[enable start]
-  only_if { systemd_enabled }
+  only_if { node['exabgp']['systemd']['enabled'] }
 end
