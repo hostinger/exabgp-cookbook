@@ -8,7 +8,7 @@ platforms:
   - name: centos-7
 
 suites:
-  - name: source
+  - name: source-3.4
     run_list:
       - recipe[exabgp::source]
     attributes:
@@ -24,6 +24,31 @@ suites:
             - 192.168.169.52/32
             - 2001:bad::1/128
         source_version: '3.4'
+        hubot:
+          enable: true
+        exazk:
+          enable: true
+          routes:
+            - 192.168.2.2/32
+            - 2001:bad::3/128
+  - name: source-4.2
+    run_list:
+      - recipe[exabgp::source]
+    attributes:
+      exabgp:
+        ipv4:
+          neighbor: 192.168.1.1
+          anycast:
+            - 192.168.2.1/32
+            - 2001:bad::2/128
+        ipv6:
+          neighbor: 2001:dead::179
+          anycast:
+            - 192.168.169.52/32
+            - 2001:bad::1/128
+        source_version: '4.2'
+        python:
+          version: '3.9.4'
         hubot:
           enable: true
         exazk:
