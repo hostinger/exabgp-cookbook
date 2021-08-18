@@ -48,8 +48,8 @@ template 'exabgp: config' do
              peer_as: node['exabgp']['peer_as'],
              community: node['exabgp']['community'].join(' '))
   mode 0o0644
-  notifies :run, 'execute[reload-exabgp-config]' unless node['exabgp']['systemd']['enabled']
-  notifies :reload, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
+  notifies :run, 'execute[restart-exabgp]' unless node['exabgp']['systemd']['enabled']
+  notifies :restart, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
 end
 
 template '/etc/exabgp/neighbor-changes.rb' do
@@ -60,25 +60,20 @@ template '/etc/exabgp/neighbor-changes.rb' do
               event: node['exabgp']['hubot']['event']
             }
   mode 0o0755
-  notifies :run, 'execute[reload-exabgp-config]' unless node['exabgp']['systemd']['enabled']
-  notifies :reload, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
+  notifies :run, 'execute[restart-exabgp]' unless node['exabgp']['systemd']['enabled']
+  notifies :restart, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
 end
 
 template '/etc/exabgp/exazk.rb' do
   variables config: node['exabgp']['exazk'],
             routes: exabgp_exazk_routes
   mode 0o0755
-  notifies :run, 'execute[reload-exabgp-config]' unless node['exabgp']['systemd']['enabled']
-  notifies :reload, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
+  notifies :run, 'execute[restart-exabgp]' unless node['exabgp']['systemd']['enabled']
+  notifies :restart, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
   only_if { node['exabgp']['exazk']['enable'] }
 end
 
 gem_package 'exazk' if node['exabgp']['exazk']['enable']
-
-execute 'reload-exabgp-config' do
-  action :nothing
-  command 'sv 2 exabgp'
-end
 
 execute 'restart-exabgp' do
   action :nothing
