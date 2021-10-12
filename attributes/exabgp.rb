@@ -37,3 +37,9 @@ default['exabgp']['python']['version'] = '2.7.18'
 default['exabgp']['python']['path'] = '/usr/local/pyenv/shims'
 
 default['pyenv']['git_ref'] = '1.2.26'
+
+default['exabgp']['exporter']['binary_url'] = 'https://github.com/hostinger/packages/releases/download/v1.0.0/exabgp_exporter'
+default['exabgp']['exporter']['user'] = 'nobody'
+default['exabgp']['exporter']['group'] = 'nobody'
+default['exabgp']['exporter']['dir'] = '/opt/exabgp_exporter'
+default['exabgp']['tags'] = %w(exporter)
