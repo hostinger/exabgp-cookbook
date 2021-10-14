@@ -15,6 +15,7 @@ default['exabgp']['ipv6']['anycast'] = []
 default['exabgp']['source_version'] = 'master'
 default['exabgp']['bin_path'] = '/usr/local/bin/exabgp'
 default['exabgp']['config_path'] = '/etc/exabgp/exabgp.conf'
+default['exabgp']['script_path'] = '/etc/exabgp/exabgp.sh'
 
 default['exabgp']['watchdog_flag_file'] = '/tmp/exabgp-announce'
 
@@ -35,5 +36,7 @@ default['exabgp']['hubot']['event'] = 'sre'
 
 default['exabgp']['python']['version'] = '2.7.18'
 default['exabgp']['python']['path'] = '/usr/local/pyenv/shims'
+
+default['exabgp']['env_path'] = "/usr/local/pyenv/versions/#{node['exabgp']['python']['version']}/etc/exabgp/exabgp.env"
 
 default['pyenv']['git_ref'] = '1.2.26'

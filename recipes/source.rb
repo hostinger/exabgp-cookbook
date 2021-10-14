@@ -10,5 +10,6 @@ git '/usr/src/exabgp' do
 end
 
 node.normal['exabgp']['bin_path'] = '/usr/src/exabgp/sbin/exabgp'
+node.normal['exabgp']['env_path'] = '/usr/src/exabgp/etc/exabgp/exabgp.env'
 
 include_recipe 'exabgp::default'

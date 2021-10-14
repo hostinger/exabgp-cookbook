@@ -28,6 +28,13 @@ pyenv_pip 'exabgp' unless node['recipes'].include? 'exabgp::source'
 
 directory '/etc/exabgp'
 
+template '/etc/exabgp/exabgp.sh' do
+  variables env_path: node['exabgp']['env_path']
+  mode 0o0755
+  notifies :run, 'execute[restart-exabgp]' unless node['exabgp']['systemd']['enabled']
+  notifies :restart, 'service[exabgp]' if node['exabgp']['systemd']['enabled']
+end
+
 template 'exabgp: config' do
   path node['exabgp']['config_path']
   source 'exabgp.conf.erb'
@@ -90,9 +97,9 @@ systemd_service 'exabgp' do
   unit_requires node['exabgp']['systemd']['requires'] if node['exabgp']['systemd']['requires']
   unit_condition_path_exists node['exabgp']['config_path']
   service_environment 'exabgp_daemon_daemonize' => 'false'
+  service_exec_start_pre node['exabgp']['script_path']
   service_exec_start "/bin/bash -c 'PATH=#{node['exabgp']['python']['path']}:$PATH #{node['exabgp']['bin_path']} #{node['exabgp']['config_path']}'"
   service_exec_reload '/bin/kill -s USR1 $MAINPID'
-  service_user 'nobody'
   install_wanted_by 'multi-user.target'
   only_if { node['exabgp']['systemd']['enabled'] }
 end
