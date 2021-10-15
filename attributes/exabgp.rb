@@ -16,6 +16,7 @@ default['exabgp']['source_version'] = 'master'
 default['exabgp']['bin_path'] = '/usr/local/bin/exabgp'
 default['exabgp']['config_path'] = '/etc/exabgp/exabgp.conf'
 default['exabgp']['script_path'] = '/etc/exabgp/exabgp.sh'
+default['exabgp']['src_path'] = '/usr/src/exabgp'
 
 default['exabgp']['watchdog_flag_file'] = '/tmp/exabgp-announce'
 
