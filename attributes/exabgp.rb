@@ -35,6 +35,8 @@ default['exabgp']['hubot']['url'] = 'http://localhost:9998'
 default['exabgp']['hubot']['secret'] = 'secret'
 default['exabgp']['hubot']['event'] = 'sre'
 
+default['exabgp']['exporter']['enable'] = false
+
 default['exabgp']['python']['version'] = '2.7.18'
 default['exabgp']['python']['path'] = '/usr/local/pyenv/shims'
 

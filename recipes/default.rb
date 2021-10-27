@@ -45,6 +45,7 @@ template 'exabgp: config' do
              local_preference: node['exabgp']['local_preference'],
              route_ipv4: route('ipv4'),
              enable_ipv4_static_route: node['exabgp']['ipv4']['enable_static_route'],
+             enable_exporter: node['exabgp']['exporter']['enable'],
              enable_hubot: node['exabgp']['hubot']['enable'],
              enable_exazk: node['exabgp']['exazk']['enable'],
              exazk_routes: node['exabgp']['exazk']['routes'],

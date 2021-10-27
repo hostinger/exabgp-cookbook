@@ -11,6 +11,12 @@ process announce-routes {
   run /etc/exabgp/exazk.rb;
 }
 <% end %>
+<% if @enable_exporter -%>
+process exabgp_exporter {
+  run /opt/exabgp_exporter/exabgp_exporter --log.format="logger:stderr?json=true" stream;
+  encoder json;
+}
+<% end %>
 <% if @neighbor_ipv4 %>
 neighbor <%= @neighbor_ipv4 %> {
   description "Upstream IPv4 provider";
@@ -81,6 +87,25 @@ template {
     <% if @enable_exazk && @exazk_routes.any? -%>
     api announce-routes-ipv6 {
       processes [announce-routes];
+    }
+    <% end %>
+    <% if @enable_exporter -%>
+    api logging {
+      processes [ exabgp_exporter ];
+      neighbor-changes;
+      signal;
+      receive {
+        parsed;
+        notification;
+        update;
+        refresh;
+      }
+      send {
+        parsed;
+        notification;
+        update;
+        refresh;
+      }
     }
     <% end %>
   }
