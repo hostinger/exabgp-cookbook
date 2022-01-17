@@ -20,7 +20,9 @@
 include_recipe 'build-essential::default' if node['exabgp']['exazk']['enable']
 include_recipe 'runit' unless node['exabgp']['systemd']['enabled']
 
-pyenv_system_install 'system'
+pyenv_install 'system' do
+  git_ref node['pyenv']['git_ref']
+end
 pyenv_python node['exabgp']['python']['version']
 pyenv_global node['exabgp']['python']['version']
 
