@@ -4,4 +4,4 @@ touch <%= @env_path %>
 
 mkfifo /run/exabgp.{in,out}
 chmod 600 /run/exabgp.{in,out}
-chown 99:99 /run/exabgp.{in,out}
+chown nobody:nobody /run/exabgp.{in,out}
